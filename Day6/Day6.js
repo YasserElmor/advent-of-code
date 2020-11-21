@@ -1,5 +1,6 @@
 const fs  = require('fs');
 
+//part 1
 
 //the command extractor function takes a string and returns an array containing the command, the starting point, and the ending point
 function command_extractor(str){
@@ -43,11 +44,79 @@ function command_array_creator(arr){
   //the function would return [ [ 'turnoff', [ 812, 389 ], [ 865, 874 ] ], [ 'toggle', [ 205, 417 ], [ 703, 826 ] ] ]
 }
 
+
+
+//the Light constructor holds its on-state as a boolean property and has methods to turn it on, off, or toggle its state
+function Light(coordinates){
+  this.coordinates = coordinates;
+  this.on = false;
+  this['turnon'] = function turnon (){
+    this.on = true;
+  }
+  this['turnoff'] = function turnoff(){
+    this.on = false;
+  }
+  this['toggle'] = function toggle(){
+    this.on = ! this.on;
+  }
+}
+
+//the light_array_creator function returns an array of 999 * 999 light objects [0, 0] through [999, 999]
+function light_array_creator(){
+  arr = [];
+  for(i = 0; i < 1000; i++){
+    arr.push([])
+    for(j = 0; j < 1000; j++){
+      arr[i].push(new Light([i, j]));
+    }
+  }
+  return arr;
+}
+
+
+// the command_executor function takes an array of commands, modifies the array of lights using the commands, and returns the new array of lights.
+function command_executor(arr){
+  command_array = command_array_creator(arr);
+  light_array = light_array_creator();
+  command_array.forEach( command => {
+     cmd = command[0],
+     [x1, y1] = command[1],
+     [x2, y2] = command[2];
+
+     for( i = x1; i <= x2; i++){
+       for( j = y1; j <= y2; j++){
+         light_array[i][j][cmd]();
+       }
+     }
+  })
+  return light_array
+}
+
+// the command_executor function takes an array of commands, applies them to the light grid, and returns the number of on lights
+function no_of_on_lights(arr){
+  arr = command_executor(arr);
+  let on_lights_arr = [];
+    for( i = 0; i < 1000; i++){
+      for( j = 0; j < 1000; j++){
+        if(arr[i][j].on){
+          on_lights_arr.push(arr[i][j]);
+        }
+      }
+    }
+    let length = on_lights_arr.length;
+    return length
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 fs.readFile('Day6.txt', 'utf8', (err, data) => {
   if (err) {
     console.error(err);
     return;
   }
   data = data.split('\n');
-  console.log(command_array_creator(data));
+  // console.log(no_of_on_lights(data)) //part 1 ans 543903
 })
