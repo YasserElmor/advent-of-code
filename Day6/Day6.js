@@ -47,8 +47,7 @@ function command_array_creator(arr){
 
 
 //the Light constructor holds its on-state as a boolean property and has methods to turn it on, off, or toggle its state
-function Light(coordinates){
-  this.coordinates = coordinates;
+function Light(){
   this.on = false;
   this['turnon'] = function turnon (){
     this.on = true;
@@ -62,12 +61,12 @@ function Light(coordinates){
 }
 
 //the light_array_creator function returns an array of 999 * 999 light objects [0, 0] through [999, 999]
-function light_array_creator(){
+function light_array_creator(light_constructor){
   arr = [];
   for(i = 0; i < 1000; i++){
     arr.push([])
     for(j = 0; j < 1000; j++){
-      arr[i].push(new Light([i, j]));
+      arr[i].push(new light_constructor);
     }
   }
   return arr;
@@ -75,9 +74,9 @@ function light_array_creator(){
 
 
 // the command_executor function takes an array of commands, modifies the array of lights using the commands, and returns the new array of lights.
-function command_executor(arr){
+function command_executor(arr, light_constructor){
   command_array = command_array_creator(arr);
-  light_array = light_array_creator();
+  light_array = light_array_creator(light_constructor);
   command_array.forEach( command => {
      cmd = command[0],
      [x1, y1] = command[1],
@@ -94,7 +93,7 @@ function command_executor(arr){
 
 // the command_executor function takes an array of commands, applies them to the light grid, and returns the number of on lights
 function no_of_on_lights(arr){
-  arr = command_executor(arr);
+  arr = command_executor(arr, Light);
   let on_lights_arr = [];
     for( i = 0; i < 1000; i++){
       for( j = 0; j < 1000; j++){
@@ -108,8 +107,34 @@ function no_of_on_lights(arr){
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// part 2
 
+//the new Light_2 constructor has a brightness property and 3 methods to increment or decrement the brightness of a light instance
+function Light_2(){
+  this.brightness = 0;
+  this['turnon'] = function turnon (){
+    this.brightness += 1 ;
+  }
+  this['turnoff'] = function turnoff(){
+    if(this.brightness > 0){
+      this.brightness -= 1;
+    }
+  }
+  this['toggle'] = function toggle(){
+    this.brightness += 2 ;
+  }
+}
 
+function aggregate_brightness(arr){
+  arr = command_executor(arr, Light_2);
+  let brightness = 0;
+  for ( i = 0; i < 1000; i++){
+    for( j = 0; j < 1000; j++){
+      brightness += arr[i][j].brightness;
+    }
+  }
+  return brightness;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 fs.readFile('Day6.txt', 'utf8', (err, data) => {
@@ -118,5 +143,6 @@ fs.readFile('Day6.txt', 'utf8', (err, data) => {
     return;
   }
   data = data.split('\n');
-  // console.log(no_of_on_lights(data)) //part 1 ans 543903
+  console.log(no_of_on_lights(data)) //part 1 ans 543903
+  console.log(aggregate_brightness(data))
 })
